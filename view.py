@@ -1,8 +1,10 @@
+import datetime
+
 from app import app, db
-from models import UserModel,  RoleModel, RestaurantModel, DishModel, take_role, restaurant_access
+from models import UserModel,  RoleModel, RestaurantModel, DishModel, take_role, restaurant_access, admin_access
 from flask import request, jsonify
 from flask_jwt_extended import jwt_required, current_user
-
+from datetime import datetime
 
 
 @app.route("/register", methods=["POST"])
@@ -20,9 +22,10 @@ def register():
                               "last_name": "last_name",
                               "email":"email",
                               "password":"password"}
-         return:
-            responses:
-                    201
+         response:
+                200:
+                    json:
+                        {"access":"token"}
             """
     params = request.json
     user = UserModel(**params)
@@ -40,9 +43,13 @@ def login():
                required:
                         "email"
                         "password"
-            request example:
-                            { "email":"email",
-                              "password":"password"}
+                    request example:
+                                    { "email":"email",
+                                      "password":"password"}
+                response:
+                        202:
+                            json:
+                                {"access":"token"}
                 """
     email = request.json.get("email", None)
     password = request.json.get("password", None)
@@ -68,7 +75,11 @@ def add_restaurant():
             Json param:
                 required:
                         "restaurant_slug" - unique identificator
-            """
+         response:
+                201:
+                    json:
+                        {"restaurant_slug":"slug"}
+        """
     params = request.json
     restaurant = RestaurantModel(**params)
     restaurant.users.append(current_user)
@@ -89,10 +100,12 @@ def add_access_user():
 
             request example:
                             { "slug": "slug", "email":"email"}
-         return
-            Json param:
-                required:
-                        "restaurant_slug" - unique identificator
+
+                {"restaurant_slug": slug, "email": email}
+         response:
+                201:
+                    json:
+                        {"restaurant_slug":"slug", "email": "email"}
             """
     params = request.json
     email = params.get("email")
@@ -127,13 +140,14 @@ def add_menu():
                                                "dish_1":{"name":"name",
                                                          "description":"description"}
                                                                                     ...}}}
-    return:
-            responses:
-                    204
+     response:
+        204:
+            json:
+                {}
         """
     menu = request.json
     restaurant = menu.get("restaurant")
-    if restaurant == current_user.restaurant:
+    if restaurant != current_user.restaurant.slug:
         return jsonify({"msg":"You do not have access to the restaurant {}".format(restaurant)}), 403
     date = DishModel.take_date(menu)
     menu_for_date = menu.get(str(date))
@@ -145,8 +159,8 @@ def add_menu():
         new_dish = DishModel(date=date, restaurant=current_user.restaurant, **dish_dict)
         dishes_to_commit.append(new_dish)
     db.session.add_all(dishes_to_commit)
-    # db.session.commit()
-    return jsonify({"access":"access"}), 204
+    db.session.commit()
+    return jsonify(), 204
 
 
 @app.route("/create_employee", methods=["POST"])
@@ -159,19 +173,51 @@ def create_employee():
                             "first_name"
                             "last_name"
                             "email"
+                            "password"
                             "role":"employee" - required value param
                 request example:
                                 { "first_name": "first_name",
                                 "last_name": "last_name",
+                                "password": ""password""
                                 "email":"email",
                                 "role":"employee" }
-             return:
-                responses:
-                        201
+             response:
+                    201:
+                        json:
+                            {"access":"token"}
                 """
     params = request.json
     user = UserModel(**params)
     db.session.add(user)
     token = user.get_token()
+    db.session.commit()
     return jsonify({"access_token": token}), 201
 
+
+@app.route("/menu", methods=["GET"])
+@app.route("/menu/<date>", methods=["GET"])
+@jwt_required()
+def menu(date=datetime.utcnow().date()):
+    """Endpoint respond today menu.
+                request:
+                   slug:
+                       not required:
+                                    /<YYYY-MM-DD> - response  menu by date
+                   request example:
+                                   /menu - today menu
+                                   /menu/2022-12-11 - menu on date
+                response:
+                        200:
+                            json:
+                               {"dish_0":{"name":"name",
+                                         "description":"description"},
+                                "dish_1":{"name":"name",
+                                         "description":"description"....}
+    """
+    dishes = DishModel.query.filter_by(date=datetime(2022, 12, 11)).all()
+    i = 0
+    menu = {}
+    for d in dishes:
+        menu["dish-{}".format(i)] = d.dish_dict
+        i += 1
+    return jsonify(menu), 200

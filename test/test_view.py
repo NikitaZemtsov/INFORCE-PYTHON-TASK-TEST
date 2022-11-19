@@ -1,5 +1,6 @@
 from main import app
 import pytest
+from datetime import datetime
 
 alex_token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY2ODgwOTc1NSwianRpIjoiNmY0MTgxNDgtZTc2Ni00NTRmLWJhZjktOWZlOWE5YmQ3ZGNmIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6MSwibmJmIjoxNjY4ODA5NzU1LCJleHAiOjE2Njk1MDA5NTV9.zScsvPGef2IQM6G7L0u3hE8-umCue9RC4ZZng7Nwy2o"
 all_token = {}
@@ -24,8 +25,8 @@ def test_register(json):
         assert token != ""
 
 
-# alex_token = all_token.get("Alex")
-# bob_token = all_token.get("Bob")
+alex_token = all_token.get("Alex")
+bob_token = all_token.get("Bob")
 
 def test_login():
     with app.test_client() as test_client:
@@ -99,4 +100,43 @@ def test_add_menu():
                                                                                  "description": "description2"}}}})
         assert restaurant.status_code == 204
 
-test_add_menu()
+
+def test_add_menu_fall_data():
+    with app.test_client() as test_client:
+        restaurant = test_client.post("/add_menu",
+                                      headers={"Authorization": alex_token},
+                                      json={"restaurant": "FALL",
+                                            "2022-12-11": {"timedelta": "10",
+                                                           "dishes": {"dish_0": {"name": "dish_1",
+                                                                                 "description": "description1"},
+                                                                      "dish_1": {"name": "dish_2",
+                                                                                 "description": "description2"}}}})
+        assert restaurant.status_code == 403
+        assert restaurant.json.get("msg") == "You do not have access to the restaurant FALL"
+
+
+parametez_new_user = [{"first_name": "Stev",
+              "email": "Stev@gmail.com",
+              "last_name": "Seagal",
+              "password": "1111",
+               "role": "employee"}]
+
+
+@pytest.mark.parametrize("json", parametez_new_user)
+def test_create_employee(json):
+    with app.test_client() as test_client:
+        user = test_client.post("/create_employee", json=json)
+        assert user.status_code == 201
+        token = user.json.get("access_token")
+        all_token[json.get("first_name")] = token
+        assert token != ""
+
+
+stev_token = all_token.get("Steve")
+
+def test_today_menu():
+    with app.test_client() as test_client:
+        response = test_client.get("/menu", headers={"Authorization": alex_token}, date=datetime(2022, 12, 11))
+        assert response.status_code == 200
+        assert response.json == {'dish-0': {'description': 'description1', 'name': 'dish_1'},
+                                 'dish-1': {'description': 'description2', 'name': 'dish_2'}}

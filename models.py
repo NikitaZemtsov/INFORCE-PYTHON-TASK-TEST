@@ -24,12 +24,18 @@ def take_role(**kwargs):
     return role
 
 
-def restaurant_access():
+def restaurant_access():   # Можно сделать декаратор
     restaurant = RestaurantModel.query.filter_by(id=current_user.restaurant_id).first()
     if restaurant:
         return restaurant
     return
 
+
+def admin_access(): # Не реализовано в вьюхею. Можно сделать декаратор
+    restaurant = RestaurantModel.query.filter_by(id=current_user.role).first()
+    if restaurant:
+        return restaurant
+    return
 
 
 class RoleModel(db.Model):
@@ -74,15 +80,24 @@ class DishModel(db.Model):
                 return date.date()
         return
 
+    @property
+    def dish_dict(self):
+        dish_dict = {}
+        dish_dict["name"] = self.name
+        dish_dict["description"] = self.description
+        return dish_dict
+
+
 class RestaurantModel(db.Model):
     """
-    Добавлять рестораны могут только авторизированные пользователи с ролью "restaurant"
+        Only authorized users with the "restaurant" role can add restaurants
     """
+
     __tablename__ = "restaurants"
     id = db.Column(db.Integer(), primary_key=True)
     slug = db.Column(db.String(255), nullable=False, unique=True)
     name = db.Column(db.String(255), nullable=False, unique=True)
-    users = db.relationship('UserModel', backref="restaurant")  # Юзеры которые могу добавлять блюда
+    users = db.relationship('UserModel', backref="restaurant")  # Юзеры которые могу добавлять блюда. Нужно сделать проверку
     dishes = db.relationship('DishModel', backref="restaurant")
 
     def __init__(self, *args, **kwargs):
@@ -107,22 +122,19 @@ class UserModel(db.Model):
 
     def __init__(self, **kwargs):
         """
-        Планируется 3 роли
-        "restaurant"
-        "employee"
-        "admin"
-        Создание юзера делиться на два варианта:
-        1) Создание юзера с ролью "restaurant". Рестораны могут сами регестрироваться.
-        2) Создание юзера "employee".
-            Данного юзера может создавать только пользователь с правами "admin".
+        3 roles planned:
+                "restaurant"
+                "employee"
+                "admin"
+        Creating a user is divided into two options:
+        1) Creation of the user with a role "restaurant". Restaurants can register themselves.
+        2) Creation of the user with role "employee". create_employee()
+            This user can only be created by a user with "admin" rights.
         """
         self.password = generate_password_hash(kwargs.get('password')).decode("utf-8")
         self.first_name = kwargs.get('first_name')
         self.last_name = kwargs.get('last_name')
-        self.email = kwargs.get("email") # Необходима проверка уникальности
-
-
-
+        self.email = kwargs.get("email")       # Необходима проверка уникальности
 
     def get_token(self, expire_time=8):
         expire_delta = timedelta(expire_time)
