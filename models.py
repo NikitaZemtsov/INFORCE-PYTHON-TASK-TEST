@@ -1,9 +1,10 @@
-from app import db, jwt
+from app import db, jwt, Base
 from slugify import slugify
 from datetime import datetime
 from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, current_user
 from datetime import timedelta
+from sqlalchemy.orm import relationship
 import re
 
 
@@ -19,8 +20,8 @@ def user_lookup_callback(_jwt_header, jwt_data):
 
 
 def take_role(**kwargs):
-    role = kwargs.get("role", "restaurant")
-    role = RoleModel.query.filter_by(name=role).first()
+    role_name = kwargs.get("role", "restaurant")
+    role = RoleModel.query.filter_by(name=role_name).first()
     return role
 
 
@@ -38,78 +39,33 @@ def admin_access(): # Не реализовано в вьюхею. Можно с
     return
 
 
-class RoleModel(db.Model):
-    __tablename__ = "roles"
-    id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(100), unique=True, nullable=False)
-    description = db.Column(db.String(255))
+class UsersMeals(Base):
+    __tablename__ = 'users_meals'
+    user_id = db.Column(
+                        db.Integer,
+                        db.ForeignKey('users.id'),
+                        primary_key=True)
 
-    def __repr__(self):
-        return "{name}".format(name=self.name)
-
-
-users_roles = db.Table("users_roles",
-                       db.Column("user_id", db.Integer, db.ForeignKey("users.id")),
-                       db.Column("role_id", db.Integer, db.ForeignKey("roles.id")))
-
-users_meals = db.Table("users_meals",
-                       db.Column("user_id", db.Integer, db.ForeignKey("users.id")),
-                       db.Column("dish_id", db.Integer, db.ForeignKey("dishes.id")))
+    dish_id = db.Column(
+                        db.Integer,
+                        db.ForeignKey('dishes.id'),
+                        primary_key=True)
 
 
-class DishModel(db.Model):
-    __tablename__ = "dishes"
-    id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(255), nullable=False)
-    description = db.Column(db.String(255), nullable=False)
-    date = db.Column(db.DateTime(), nullable=False, default=datetime.utcnow)
-    user = db.relationship('UserModel', secondary=users_meals, backref="dishes", lazy=True)
-    restaurant_id = db.Column(db.Integer, db.ForeignKey("restaurants.id"))
+class UsersRoles(Base):
+    __tablename__ = 'users_roles'
+    user_id = db.Column(
+                        db.Integer,
+                        db.ForeignKey('users.id'),
+                        primary_key=True)
 
-    def __init__(self, date, restaurant, *args, **kwargs):
-        super(DishModel, self).__init__(*args, **kwargs)
-        self.date = date
-        self.restaurant_id = restaurant.id
-
-    @classmethod
-    def take_date(cls, dict):
-        for key, value in dict.items():
-            key = re.search(r'\d{4}\-\d{2}\-\d{2}', key)
-            if key:
-                date = datetime.strptime(key.group(), "%Y-%m-%d")
-                return date.date()
-        return
-
-    @property
-    def dish_dict(self):
-        dish_dict = {}
-        dish_dict["name"] = self.name
-        dish_dict["description"] = self.description
-        return dish_dict
+    role_id = db.Column(
+                        db.Integer,
+                        db.ForeignKey('roles.id'),
+                        primary_key=True)
 
 
-class RestaurantModel(db.Model):
-    """
-        Only authorized users with the "restaurant" role can add restaurants
-    """
-
-    __tablename__ = "restaurants"
-    id = db.Column(db.Integer(), primary_key=True)
-    slug = db.Column(db.String(255), nullable=False, unique=True)
-    name = db.Column(db.String(255), nullable=False, unique=True)
-    users = db.relationship('UserModel', backref="restaurant")  # Юзеры которые могу добавлять блюда. Нужно сделать проверку
-    dishes = db.relationship('DishModel', backref="restaurant")
-
-    def __init__(self, *args, **kwargs):
-        super(RestaurantModel, self).__init__(*args, **kwargs)
-        if self.name:
-            self.slug = slugify(str(self.name))
-
-    def __repr__(self):
-        return "{name}".format(name=self.name)
-
-
-class UserModel(db.Model):
+class UserModel(Base):
     __tablename__ = "users"
     id = db.Column(db.Integer(), primary_key=True)
     restaurant_id = db.Column(db.Integer, db.ForeignKey("restaurants.id"))
@@ -118,7 +74,7 @@ class UserModel(db.Model):
     last_name = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(255), unique=True, nullable=False)
     registration = db.Column(db.DateTime(), nullable=False, default=datetime.utcnow)
-    role = db.relationship('RoleModel', secondary=users_roles, backref="user", lazy=True)  # заглушка на масштабирование
+    role = relationship('RoleModel', secondary='users_roles', lazy=True)
 
     def __init__(self, **kwargs):
         """
@@ -149,6 +105,73 @@ class UserModel(db.Model):
         if not check_password_hash(user.password, password):
             raise Exception("Uncorrected email or password ")
         return user
+
+
+class RoleModel(Base):
+    __tablename__ = "roles"
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+    description = db.Column(db.String(255))
+    user = relationship('UserModel', secondary='users_roles')
+
+    def __repr__(self):
+        return "{name}".format(name=self.name)
+
+
+class DishModel(Base):
+    __tablename__ = "dishes"
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.String(255), nullable=False)
+    date = db.Column(db.DateTime(), nullable=False, default=datetime.utcnow)
+    user = relationship('UserModel', secondary="users_meals", backref="dishes", lazy=True)
+    restaurant_id = db.Column(db.Integer, db.ForeignKey("restaurants.id"))
+
+    def __init__(self, date, restaurant, *args, **kwargs):
+        super(DishModel, self).__init__(*args, **kwargs)
+        self.date = date
+        self.restaurant_id = restaurant.id
+
+    @classmethod
+    def take_date(cls, dict):
+        for key, value in dict.items():
+            key = re.search(r'\d{4}\-\d{2}\-\d{2}', key)
+            if key:
+                date = datetime.strptime(key.group(), "%Y-%m-%d")
+                return date.date()
+        return
+
+    @property
+    def dish_dict(self):
+        dish_dict = {}
+        dish_dict["name"] = self.name
+        dish_dict["description"] = self.description
+        return dish_dict
+
+
+class RestaurantModel(Base):
+    """
+        Only authorized users with the "restaurant" role can add restaurants
+    """
+
+    __tablename__ = "restaurants"
+    id = db.Column(db.Integer(), primary_key=True)
+    slug = db.Column(db.String(255), nullable=False, unique=True)
+    name = db.Column(db.String(255), nullable=False, unique=True)
+    users = relationship('UserModel', backref="restaurant")  # Юзеры которые могу добавлять блюда. Нужно сделать проверку
+    dishes = relationship('DishModel', backref="restaurant")
+
+    def __init__(self, *args, **kwargs):
+        super(RestaurantModel, self).__init__(*args, **kwargs)
+        if self.name:
+            self.slug = slugify(str(self.name))
+
+    def __repr__(self):
+        return "{name}".format(name=self.name)
+
+
+
+
 
 
 

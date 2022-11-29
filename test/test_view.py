@@ -1,142 +1,181 @@
 from main import app
 import pytest
+from models import RoleModel, RestaurantModel, DishModel, UserModel
 from datetime import datetime
-
-alex_token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY2ODgwOTc1NSwianRpIjoiNmY0MTgxNDgtZTc2Ni00NTRmLWJhZjktOWZlOWE5YmQ3ZGNmIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6MSwibmJmIjoxNjY4ODA5NzU1LCJleHAiOjE2Njk1MDA5NTV9.zScsvPGef2IQM6G7L0u3hE8-umCue9RC4ZZng7Nwy2o"
-all_token = {}
-
-parametez = [{"first_name": "Alex",
-              "email": "alex@gmail.com",
-              "last_name": "Leo",
-              "password": "1111"},
-             {"first_name": "Bob",
-              "email": "Bob@gmail.com",
-              "last_name": "Bear",
-              "password": "2222"}]
+from conftest import user, roles
 
 
-@pytest.mark.parametrize("json", parametez)
-def test_register(json):
-    with app.test_client() as test_client:
-        user = test_client.post("/register", json=json)
-        assert user.status_code == 201
-        token = user.json.get("access_token")
-        all_token[json.get("first_name")] = token
-        assert token != ""
+def test_roles(roles):
+    assert len(roles) == 3
+    assert roles[0].name == "restaurant"
+    assert roles[1].name == "employee"
+    assert roles[2].name == "admin"
 
 
-alex_token = all_token.get("Alex")
-bob_token = all_token.get("Bob")
-
-def test_login():
-    with app.test_client() as test_client:
-        login = test_client.post("/login",
-                                 headers={"Authorization": alex_token},
-                                 json={"email": "alex@gmail.com", "password": "1111"})
-        assert login.status_code == 202
-        assert login.json.get("access_token") != ""
+def test_model(user):
+    assert user.first_name == "Alex"
+    assert user.role[0].name == 'restaurant'
+    assert user.role[0].description == 'pass'
 
 
-def test_login_fall_password():
-    with app.test_client() as test_client:
-        login = test_client.post("/login",
-                                 headers={"Authorization": alex_token},
-                                 json={"email": "alex@gmail.com", "password": "fall"})
-        print(login.status_code, login.json)
-        assert login.status_code == 401
-        assert login.json.get("msg") == "Bad username or password"
+parametez_register = [{"first_name": "Bob",
+                       "email": "Bob@gmail.com",
+                       "last_name": "Bear",
+                       "password": "2222"}]
 
 
-def test_login_fall_email():
-    with app.test_client() as test_client:
-        login = test_client.post("/login",
-                                 headers={"Authorization": alex_token},
-                                 json={"email": "fall", "password": "1111"})
-        assert login.status_code == 401
-        assert login.json.get("msg") == "Bad username or password"
+@pytest.mark.parametrize("json", parametez_register)
+def test_register(json, client):
+    req = client.post("/register", json=json)
+    assert req.status_code == 201
+    assert req.json.get("access_token") != ""
+
+parametez_register = [({"first_name": "Jack",
+                       "email": "Jack@gmail.com",
+                       "last_name": "Back",
+                       "password": "2222",
+                       "role": "employee"},{"code":201})]
 
 
-def test_add_restaurant():
-    with app.test_client() as test_client:
-        restaurant = test_client.post("/add_restaurant",
-                                      headers={"Authorization": alex_token},
-                                      json={"name": "NaMe"})
-        assert restaurant.json.get("restaurant_slug") == "name"
+@pytest.mark.parametrize("json, response", parametez_register)
+def test_register_employee(json,response, user_admin, admin_headers, client):
+
+    """test register user(admin) with access to add new employee"""
+
+    req = client.post("/register", headers=admin_headers, json=json)
+    assert req.status_code == response.get("code")
+    assert req.json.get("access_token") != ""
+    employee = UserModel.query.filter_by(email=json.get("email")).first()
+    assert employee.role[0].name == json.get("role")
+    assert employee.first_name == json.get("first_name")
+    assert employee.last_name == json.get("last_name")
 
 
-def test_add_restaurant_fall_token():
-    with app.test_client() as test_client:
-        restaurant = test_client.post("/add_restaurant",
-                                      headers={"Authorization": "fall_token"},
-                                      json={"name": "Name"})
-        assert restaurant.status_code == 401
+parametez_fall_register = [({"first_name": "Mack",
+                       "email": "Mack@gmail.com",
+                       "last_name": "Duck",
+                       "password": "2222",
+                       "role": "employee"}, {"code":201})]
 
 
-def test_add_access_user():
-    with app.test_client() as test_client:
-        restaurant = test_client.post("/add_access_user",
-                                      headers={"Authorization": alex_token},
-                                      json={"slug": "name", "email": "Bob@gmail.com"})
-        assert restaurant.status_code == 201
+@pytest.mark.parametrize("json, response", parametez_fall_register)
+def test_fall_register_employee(json, response, user_headers, client):
+
+    """test register user without access to add new employee"""
+
+    req = client.post("/register", headers=user_headers, json=json)
+    assert req.status_code == response.get("code")
+    assert req.json.get("access_token") != ""
+    employee = UserModel.query.filter_by(email=json.get("email")).first()
+    assert employee.role[0].name == "restaurant"
+    assert employee.first_name == json.get("first_name")
+    assert employee.last_name == json.get("last_name")
 
 
-def test_add_access_user_fall_slug():
-    with app.test_client() as test_client:
-        restaurant = test_client.post("/add_access_user",
-                                      headers={"Authorization": alex_token},
-                                      json={"slug": "Fall", "email": "Bob@gmail.com"})
-        assert restaurant.status_code == 403
 
 
-def test_add_menu():
-    with app.test_client() as test_client:
-        restaurant = test_client.post("/add_menu",
-                                      headers={"Authorization": alex_token},
-                                      json={"restaurant": "name",
-                                            "2022-12-11": {"timedelta": "10",
-                                                           "dishes": {"dish_0": {"name": "dish_1",
-                                                                                 "description": "description1"},
-                                                                      "dish_1": {"name": "dish_2",
-                                                                                 "description": "description2"}}}})
-        assert restaurant.status_code == 204
+parametez_login = [({"email": "alex@gmail.com",
+                     "password": "1111"},
+                    {"code": 202}),
+                   ({"email": "fall@gmail.com",
+                     "password": "1111"},
+                    {"code": 401, "msg": "Bad username or password"}),
+                   ({"email": "alex@gmail.com",
+                     "password": "FALL"},
+                    {"code": 401, "msg": "Bad username or password"})]
 
 
-def test_add_menu_fall_data():
-    with app.test_client() as test_client:
-        restaurant = test_client.post("/add_menu",
-                                      headers={"Authorization": alex_token},
-                                      json={"restaurant": "FALL",
-                                            "2022-12-11": {"timedelta": "10",
-                                                           "dishes": {"dish_0": {"name": "dish_1",
-                                                                                 "description": "description1"},
-                                                                      "dish_1": {"name": "dish_2",
-                                                                                 "description": "description2"}}}})
-        assert restaurant.status_code == 403
-        assert restaurant.json.get("msg") == "You do not have access to the restaurant FALL"
+@pytest.mark.parametrize("json, response", parametez_login)
+def test_login(json, response, client):
+    req = client.post("/login", json=json)
+    assert req.status_code == response.get("code")
+    assert req.json.get("msg") == response.get("msg")
 
 
-parametez_new_user = [{"first_name": "Stev",
-              "email": "Stev@gmail.com",
-              "last_name": "Seagal",
-              "password": "1111",
-               "role": "employee"}]
+def test_add_restaurant(user_headers, client):
+    res = client.post("/restaurants",
+                      headers=user_headers,
+                      json={"name": "NaMe"})
+    restaurant_slug = res.json.get("restaurant_slug")
+    assert restaurant_slug == "name"
+    restaurant = RestaurantModel.query.filter_by(slug=restaurant_slug).first()
+    assert restaurant.name == "NaMe"
+    assert restaurant.users[0].first_name == "Alex"
+    assert res.status_code == 201
 
 
-@pytest.mark.parametrize("json", parametez_new_user)
-def test_create_employee(json):
-    with app.test_client() as test_client:
-        user = test_client.post("/create_employee", json=json)
-        assert user.status_code == 201
-        token = user.json.get("access_token")
-        all_token[json.get("first_name")] = token
-        assert token != ""
+
+def test_add_restaurant_fall_token(client):
+    res = client.post("/restaurants",
+                      headers={"Authorization": "fall_token"},
+                      json={"name": "Name"})
+    assert res.status_code == 401
 
 
-stev_token = all_token.get("Steve")
+#
+#
+# def test_add_access_user():
+#     with app.test_client() as test_client:
+#         restaurant = test_client.post("/add_access_user",
+#                                       headers={"Authorization": alex_token},
+#                                       json={"slug": "name", "email": "Bob@gmail.com"})
+#         assert restaurant.status_code == 201
+#
+#
+# def test_add_access_user_fall_slug():
+#     with app.test_client() as test_client:
+#         restaurant = test_client.post("/add_access_user",
+#                                       headers={"Authorization": alex_token},
+#                                       json={"slug": "Fall", "email": "Bob@gmail.com"})
+#         assert restaurant.status_code == 403
+#
+#
+parametez_restaurant_menu = [({"2022-12-12": {"dishes": {"dish_0": {"name": "dish_1",
+                                                                    "description": "description1"},
+                                                         "dish_1": {"name": "dish_2",
+                                                                    "description": "description2"}}}},
+                              "name",
+                              {"code": 204, "date": "2022-12-12", "dishes_len": 2}),
+                             ({"2022-12-30": {"timedelta": "3",
+                                              "dishes": {"dish_0": {"name": "dish_1",
+                                                                    "description": "description1"},
+                                                         "dish_1": {"name": "dish_2",
+                                                                    "description": "description2"}}}},
+                              "name",
+                              {"code": 204, "date": "2022-12-30", "dishes_len": 6})]
 
-def test_today_menu():
-    with app.test_client() as test_client:
-        response = test_client.get("/menu", headers={"Authorization": alex_token}, date=datetime(2022, 12, 11))
-        assert response.status_code == 200
-        assert response.json == {'dish-0': {'description': 'description1', 'name': 'dish_1'},
-                                 'dish-1': {'description': 'description2', 'name': 'dish_2'}}
+
+@pytest.mark.parametrize("json, restaurant_slug, response", parametez_restaurant_menu)
+def test_add_menu(json, restaurant_slug, response, client, user_headers):
+    restaurant = client.post(f"/restaurant/{restaurant_slug}/menu",
+                             headers=user_headers,
+                             json=json)
+    assert restaurant.status_code == response.get("code")
+    dishes = DishModel.query.where(
+        DishModel.date >= response.get("date")).all()
+    assert len(dishes) == response.get("dishes_len")
+
+
+#
+#
+# def test_add_menu_fall_data():
+#     with app.test_client() as test_client:
+#         restaurant = test_client.post("/add_menu",
+#                                       headers={"Authorization": alex_token},
+#                                       json={"restaurant": "FALL",
+#                                             "2022-12-11": {"timedelta": "10",
+#                                                            "dishes": {"dish_0": {"name": "dish_1",
+#                                                                                  "description": "description1"},
+#                                                                       "dish_1": {"name": "dish_2",
+#                                                                                  "description": "description2"}}}})
+#         assert restaurant.status_code == 403
+#         assert restaurant.json.get("msg") == "You do not have access to the restaurant FALL"
+#
+
+#
+# def test_today_menu():
+#     with app.test_client() as test_client:
+#         response = test_client.get("/menu", headers={"Authorization": alex_token}, date=datetime(2022, 12, 11))
+#         assert response.status_code == 200
+#         assert response.json == {'dish-0': {'description': 'description1', 'name': 'dish_1'},
+#                                  'dish-1': {'description': 'description2', 'name': 'dish_2'}}
