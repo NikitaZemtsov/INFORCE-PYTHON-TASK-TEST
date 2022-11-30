@@ -1,7 +1,7 @@
 import datetime
 import pandas as pd
 from app import app, db, session
-from models import UserModel,  RoleModel, RestaurantModel, DishModel, take_role, restaurant_access, admin_access
+from models import UserModel,  RoleModel, RestaurantModel, DishModel, take_role
 from flask import request, jsonify
 from flask_jwt_extended import jwt_required, current_user, get_jwt_header, get_jwt_identity
 from datetime import datetime, timedelta
@@ -148,52 +148,60 @@ def menu(restaurant_slug):
             json:
                 {}
         """
-    menu = request.json
-    restaurant = restaurant_slug
     if request.method == "POST":
+        restaurant = restaurant_slug
         if restaurant != current_user.restaurant.slug:
             return jsonify({"msg": "You do not have access to the restaurant {}".format(restaurant)}), 403
-        menu_start_date = DishModel.take_date(menu)
-        menu_for_date = menu.get(str(menu_start_date))
-        menu_timedelta = int(menu_for_date.get("timedelta", 1)) #Preparation for creating a menu for a certain period
-        dishes = menu_for_date.get("dishes")
+        menu = request.json
+        menu_date_period = take_date(request.args.get('date_period'))
         dishes_to_commit = []
-        date_range = pd.date_range(menu_start_date, periods=menu_timedelta, freq="D")
-        for date in date_range:
-            for dish in dishes:
-                dish_dict = dishes.get(dish)
-                new_dish = DishModel(date=date, restaurant=current_user.restaurant, **dish_dict)
+        for date in menu_date_period:
+            for _, dish in menu.items():
+                new_dish = DishModel(date=date, restaurant=current_user.restaurant, **dish)
                 dishes_to_commit.append(new_dish)
         session.add_all(dishes_to_commit)
         session.commit()
         return jsonify(), 204
 
 
+@app.route("/menu", methods=["GET"])
+@jwt_required()
+def menu_voice():
+    """Endpoint respond today menu.
+                request:
+                   slug:
+                       not required:
+                                    /<YYYY-MM-DD> - response  menu by date
+                   request example:
+                                   /menu - today menu
+                                   /menu/2022-12-11 - menu on date
+                response:
+                        200:
+                            json:
+                               {"dish_0":{"name":"name",
+                                         "description":"description"},
+                                "dish_1":{"name":"name",
+                                         "description":"description"....}
+    """
+    date_period = take_date(request.args.get("date_period"))
+    print(date_period)
+    dishes = DishModel.query.where(DishModel.date.in_(date_period)).all()
+    i = 0
+    menu = {}
+    for d in dishes:
+        menu["dish-{}".format(i)] = d.dish_represent
+        i += 1
+    return jsonify(menu), 200
 
-# @app.route("/menu", methods=["GET"])
-# @app.route("/menu/<date>", methods=["GET"])
-# @jwt_required()
-# def menu(date=datetime.utcnow().date()):
-#     """Endpoint respond today menu.
-#                 request:
-#                    slug:
-#                        not required:
-#                                     /<YYYY-MM-DD> - response  menu by date
-#                    request example:
-#                                    /menu - today menu
-#                                    /menu/2022-12-11 - menu on date
-#                 response:
-#                         200:
-#                             json:
-#                                {"dish_0":{"name":"name",
-#                                          "description":"description"},
-#                                 "dish_1":{"name":"name",
-#                                          "description":"description"....}
-#     """
-#     dishes = DishModel.query.filter_by(date=datetime.utcnow()).all()
-#     i = 0
-#     menu = {}
-#     for d in dishes:
-#         menu["dish-{}".format(i)] = d.dish_dict
-#         i += 1
-#     return jsonify(menu), 200
+
+def take_date(row_date) -> list:
+    if row_date is None:
+        print()
+        return [datetime.utcnow().date()]
+    else:
+        dates = [datetime.strptime(date, "%Y-%m-%d").date() for date in row_date.split(",")]
+        if len(dates) == 2:
+            start_date, end_date = dates
+            return list(pd.date_range(start=start_date, end=end_date, freq="D"))
+        else:
+            return dates
