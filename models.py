@@ -19,15 +19,6 @@ def user_lookup_callback(_jwt_header, jwt_data):
     return UserModel.query.filter_by(id=identity).one_or_none()
 
 
-def take_date(row_date: dict):
-    for key, value in row_date.items():
-        key = re.search(r'\d{4}\-\d{2}\-\d{2}', key)
-        if key:
-            date = datetime.strptime(key.group(), "%Y-%m-%d")
-            return date.date()
-    return
-
-
 def take_role(**kwargs):
     role_name = kwargs.get("role", "restaurant")
     role = RoleModel.query.filter_by(name=role_name).first()
@@ -127,6 +118,8 @@ class RoleModel(Base):
         return "{name}".format(name=self.name)
 
 
+
+
 class DishModel(Base):
     __tablename__ = "dishes"
     id = db.Column(db.Integer(), primary_key=True)
@@ -145,7 +138,7 @@ class DishModel(Base):
     @property
     def dish_represent(self) -> dict:
         dish_dict = {}
-        dish_dict["date"] = self.date
+        dish_dict["date"] = str(self.date.date())
         dish_dict["id"] = self.id
         dish_dict["name"] = self.name
         dish_dict["description"] = self.description

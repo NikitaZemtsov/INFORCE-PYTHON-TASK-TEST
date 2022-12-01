@@ -1,9 +1,9 @@
 from main import app
 import pytest
 from models import RoleModel, RestaurantModel, DishModel, UserModel
-from datetime import datetime
+from datetime import datetime, date
 from conftest import user, roles
-from view import take_date
+from view import current_user
 
 from unittest.mock import patch
 
@@ -111,7 +111,6 @@ def test_add_restaurant_fall_token(client):
     assert res.status_code == 401
 
 
-
 parametez_restaurant_menu = [({"dish_0": {"name": "dish_1",
                                           "description": "description1"},
                                "dish_1": {"name": "dish_2",
@@ -126,14 +125,14 @@ parametez_restaurant_menu = [({"dish_0": {"name": "dish_1",
                               {"code": 204, "date": [datetime(year=2022, month=12, day=30).date(),
                                                      datetime(year=2022, month=12, day=31).date(),
                                                      datetime(year=2023, month=1, day=1).date()],
-                                            "dishes_len": 6})]
+                               "dishes_len": 6})]
 
 
 @pytest.mark.parametrize("json, restaurant_slug, date_period, response", parametez_restaurant_menu)
 def test_add_menu(json, restaurant_slug, date_period, response, client, user_headers):
     req = client.post(f"/restaurant/{restaurant_slug}/menu" + date_period,
-                             headers=user_headers,
-                             json=json)
+                      headers=user_headers,
+                      json=json)
     assert req.status_code == response.get("code")
     dishes = DishModel.query.where(
         DishModel.date.in_(response.get("date"))).all()
@@ -153,10 +152,10 @@ parametez_restaurant_menu = [({"dish_0": {"name": "dish_1",
 def test_add_menu_datenow(mock_date, json, restaurant_slug, date_period, response, client, user_headers):
     date_for_mock = response.get("date")[0]
     mock_date.utcnow.return_value = date_for_mock
-    mock_date.date.return_value = date_for_mock.date()
+    mock_date.utcnow.date.return_value = date_for_mock
     req = client.post(f"/restaurant/{restaurant_slug}/menu" + date_period,
-                             headers=user_headers,
-                             json=json)
+                      headers=user_headers,
+                      json=json)
     assert req.status_code == response.get("code")
     dishes = DishModel.query.where(
         DishModel.date.in_(response.get("date"))).all()
@@ -164,20 +163,62 @@ def test_add_menu_datenow(mock_date, json, restaurant_slug, date_period, respons
     assert dishes[0].date == date_for_mock
 
 
-parametez_restaurant_menu = [({"dish_0": {"name": "dish_1",
-                                          "description": "description1"},
-                               "dish_1": {"name": "dish_2",
-                                          "description": "description2"}},
-                              {"code": 204, "date": [datetime(year=2022, month=12, day=11)], "dishes_len": 2})]
+parametez_today_menu = [{"code": 204,
+                          "date": [datetime(year=2022, month=12, day=11)],
+                          "json": {'dish-0': {'date': '2022-12-11',
+                                              'description': 'description1',
+                                              'id': 9,
+                                              'name': 'dish_1'},
+                                   'dish-1': {'date': '2022-12-11',
+                                              'description': 'description2',
+                                              'id': 10,
+                                              'name': 'dish_2'}}}]
 
 
 @patch("view.datetime")
-@pytest.mark.parametrize("json, response", parametez_restaurant_menu)
-def test_today_menu(mock_date, json, response, client, user_headers):
+@pytest.mark.parametrize("response", parametez_today_menu)
+def test_take_today_menu(mock_date, response, client, admin_headers):
     date_for_mock = response.get("date")[0]
     mock_date.utcnow.return_value = date_for_mock
     mock_date.date.return_value = date_for_mock.date()
-    req = client.get("/menu", headers=user_headers)
-    print(req.json)
+    req = client.get("/menu", headers=admin_headers)
     assert req.status_code == 200
-    assert req.json == {} # Need to refactor date from datebase
+    assert req.json == response.get("json")
+
+
+def test_voting_for_dish(client, admin_headers, user_admin_obj):
+    req = client.post('/menu/9', headers=admin_headers)
+    dish = DishModel.query.filter_by(id=9).first()
+    assert req.status_code == 200
+    assert user_admin_obj.id == dish.user[0].id
+
+
+def test_voting_for_dish_fall_access(client, user_headers):
+    req = client.post('/menu/9', headers=user_headers)
+    assert req.status_code == 403
+    assert req.json.get("msg") == "You do not have access to do this"
+
+
+parametez_today_menu = [{"code": 204,
+                          "date": [datetime(year=2022, month=12, day=11)],
+                          "json": {'dish-0': {'count': 1,
+                                              'date': '2022-12-11',
+                                              'description': 'description1',
+                                              'id': 9,
+                                              'name': 'dish_1'},
+                                   'dish-1': {'count': 0,
+                                              'date': '2022-12-11',
+                                              'description': 'description2',
+                                              'id': 10,
+                                              'name': 'dish_2'}}}]
+
+
+@patch("view.datetime")
+@pytest.mark.parametrize("response", parametez_today_menu)
+def test_take_order(mock_date, response, client, admin_headers):
+    date_for_mock = response.get("date")[0]
+    mock_date.utcnow.return_value = date_for_mock
+    mock_date.date.return_value = date_for_mock.date()
+    req = client.get("/order", headers=admin_headers)
+    assert req.status_code == 200
+    assert req.json == response.get("json")

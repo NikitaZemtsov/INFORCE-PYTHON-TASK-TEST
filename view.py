@@ -7,8 +7,6 @@ from flask_jwt_extended import jwt_required, current_user, get_jwt_header, get_j
 from datetime import datetime, timedelta
 
 
-
-
 @app.route("/register", methods=["POST"])
 @jwt_required(optional=True)
 def register():
@@ -165,8 +163,9 @@ def menu(restaurant_slug):
 
 
 @app.route("/menu", methods=["GET"])
+@app.route("/menu/<dish_id>", methods=["POST"])
 @jwt_required()
-def menu_voice():
+def menu_vote(dish_id=None):
     """Endpoint respond today menu.
                 request:
                    slug:
@@ -183,13 +182,38 @@ def menu_voice():
                                 "dish_1":{"name":"name",
                                          "description":"description"....}
     """
+    if current_user.role[0].name == "restaurant":
+        return jsonify({"msg": "You do not have access to do this"}), 403
+    if request.method == "GET":
+        date_period = take_date(request.args.get("date_period"))
+        dishes = DishModel.query.where(DishModel.date.in_(date_period)).all()
+        i = 0
+        menu = {}
+        for d in dishes:
+            menu["dish-{}".format(i)] = d.dish_represent
+            i += 1
+        return jsonify(menu), 200
+    if request.method == "POST":
+        dish = DishModel.query.filter_by(id=int(dish_id)).first()
+        dish.user.append(current_user)
+        session.add(dish)
+        session.commit()
+        return jsonify({"user": current_user.first_name,
+                        "dish": f"{dish.id} - {dish.name}"}), 200
+
+
+@app.route("/order", methods=["GET"])
+@jwt_required()
+def order():
     date_period = take_date(request.args.get("date_period"))
-    print(date_period)
     dishes = DishModel.query.where(DishModel.date.in_(date_period)).all()
     i = 0
     menu = {}
     for d in dishes:
-        menu["dish-{}".format(i)] = d.dish_represent
+        count = len(d.user)
+        dish_dict = d.dish_represent
+        dish_dict["count"]= count
+        menu["dish-{}".format(i)] = dish_dict
         i += 1
     return jsonify(menu), 200
 

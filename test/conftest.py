@@ -91,6 +91,10 @@ def user_admin(session):
     session.commit()
     return user
 
+@pytest.fixture
+def user_admin_obj():
+    admin = UserModel.query.filter_by(email="admin@gmail.com").first()
+    return admin
 
 @pytest.fixture
 def admin_token(client):
@@ -106,6 +110,10 @@ def admin_headers(admin_token):
         "Authorization": f"Bearer {admin_token}"
     }
     return headers
+
+
+
+
 
 
 
