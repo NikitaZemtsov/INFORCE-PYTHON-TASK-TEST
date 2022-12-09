@@ -56,7 +56,7 @@ def user(session):
     user = UserModel(**{"first_name": "Alex",
                        "email": "alex@gmail.com",
                        "last_name": "Leo",
-                       "password": "1111"})
+                       "password": "11111"})
     role = RoleModel.query.filter_by(name="restaurant").first()
     user.role.append(role)
     session.add(user)
@@ -68,7 +68,7 @@ def user(session):
 def user_token(client):
     res = client.post("/login", json={
               "email": "alex@gmail.com",
-              "password": "1111"})
+              "password": "11111"})
     return res.json.get('access_token')
 
 

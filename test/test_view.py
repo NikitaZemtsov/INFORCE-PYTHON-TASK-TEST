@@ -2,6 +2,7 @@ from main import app
 import pytest
 from models import RoleModel, RestaurantModel, DishModel, UserModel
 from datetime import datetime, date
+from marshmallow import ValidationError
 from conftest import user, roles
 from view import current_user
 
@@ -24,20 +25,42 @@ def test_model(user):
 parametez_register = [{"first_name": "Bob",
                        "email": "Bob@gmail.com",
                        "last_name": "Bear",
-                       "password": "2222"}]
+                       "password": "22222"}]
 
 
 @pytest.mark.parametrize("json", parametez_register)
-def test_register(json, client):
+def test_register_restaurant_user(json, client):
     req = client.post("/register", json=json)
+    user = UserModel.query.filter_by(email=json.get("email")).first()
+    assert user.first_name == json.get("first_name")
+    assert user.last_name == json.get("last_name")
+    assert user.role[0].name == "restaurant"
     assert req.status_code == 201
     assert req.json.get("access_token") != ""
+
+
+parametez_register_validate_error = [({"first_name": "Bob",
+                                       "email": "Bob@gmail.com",
+                                       "last_name": "Bear",
+                                       "password": "22222"}, {'email': ['User with this email already exists']}),
+                                     ({"first_name": "Bob",
+                                       "email": "bobo@gmail.com",
+                                       "last_name": "Bear",
+                                       "password": "222"}, {'password': ['Length must be between 5 and 255.']})]
+
+
+@pytest.mark.parametrize("json, error", parametez_register_validate_error)
+def test_register_validate_errors(json, error, client):
+    try:
+        req = client.post("/register", json=json)
+    except ValidationError as err:
+        assert err.messages == error
 
 
 parametez_register = [({"first_name": "Jack",
                         "email": "Jack@gmail.com",
                         "last_name": "Back",
-                        "password": "2222",
+                        "password": "22222",
                         "role": "employee"}, {"code": 201})]
 
 
@@ -57,7 +80,7 @@ def test_register_employee(json, response, user_admin, admin_headers, client):
 parametez_fall_register = [({"first_name": "Mack",
                              "email": "Mack@gmail.com",
                              "last_name": "Duck",
-                             "password": "2222",
+                             "password": "22222",
                              "role": "employee"}, {"code": 201})]
 
 
@@ -75,13 +98,13 @@ def test_fall_register_employee(json, response, user_headers, client):
 
 
 parametez_login = [({"email": "alex@gmail.com",
-                     "password": "1111"},
+                     "password": "11111"},
                     {"code": 202}),
                    ({"email": "fall@gmail.com",
-                     "password": "1111"},
+                     "password": "11111"},
                     {"code": 401, "msg": "Bad username or password"}),
                    ({"email": "alex@gmail.com",
-                     "password": "FALL"},
+                     "password": "FALLL"},
                     {"code": 401, "msg": "Bad username or password"})]
 
 
@@ -96,9 +119,9 @@ def test_add_restaurant(user_headers, client):
     res = client.post("/restaurants",
                       headers=user_headers,
                       json={"name": "NaMe"})
-    restaurant_slug = res.json.get("restaurant_slug")
-    assert restaurant_slug == "name"
-    restaurant = RestaurantModel.query.filter_by(slug=restaurant_slug).first()
+    slug = res.json.get("slug")
+    assert slug == "name"
+    restaurant = RestaurantModel.query.filter_by(slug=slug).first()
     assert restaurant.name == "NaMe"
     assert restaurant.users[0].first_name == "Alex"
     assert res.status_code == 201
@@ -111,16 +134,16 @@ def test_add_restaurant_fall_token(client):
     assert res.status_code == 401
 
 
-parametez_restaurant_menu = [({"dish_0": {"name": "dish_1",
-                                          "description": "description1"},
-                               "dish_1": {"name": "dish_2",
-                                          "description": "description2"}},
+parametez_restaurant_menu = [([{"name": "dish_1",
+                                "description": "description1"},
+                               {"name": "dish_2",
+                                "description": "description2"}],
                               "name", "?date_period=2022-12-12",
                               {"code": 204, "date": [datetime(year=2022, month=12, day=12).date()], "dishes_len": 2}),
-                             ({"dish_0": {"name": "dish_1",
-                                          "description": "description1"},
-                               "dish_1": {"name": "dish_2",
-                                          "description": "description2"}},
+                             ([{"name": "dish_1",
+                                "description": "description1"},
+                               {"name": "dish_2",
+                                "description": "description2"}],
                               "name", "?date_period=2022-12-30,2023-01-01",
                               {"code": 204, "date": [datetime(year=2022, month=12, day=30).date(),
                                                      datetime(year=2022, month=12, day=31).date(),
@@ -139,10 +162,10 @@ def test_add_menu(json, restaurant_slug, date_period, response, client, user_hea
     assert len(dishes) == response.get("dishes_len")
 
 
-parametez_restaurant_menu = [({"dish_0": {"name": "dish_1",
-                                          "description": "description1"},
-                               "dish_1": {"name": "dish_2",
-                                          "description": "description2"}},
+parametez_restaurant_menu = [([{"name": "dish_1",
+                                "description": "description1"},
+                               {"name": "dish_2",
+                                "description": "description2"}],
                               "name", "",
                               {"code": 204, "date": [datetime(year=2022, month=12, day=11)], "dishes_len": 2})]
 
@@ -164,15 +187,15 @@ def test_add_menu_datenow(mock_date, json, restaurant_slug, date_period, respons
 
 
 parametez_today_menu = [{"code": 204,
-                          "date": [datetime(year=2022, month=12, day=11)],
-                          "json": {'dish-0': {'date': '2022-12-11',
-                                              'description': 'description1',
-                                              'id': 9,
-                                              'name': 'dish_1'},
-                                   'dish-1': {'date': '2022-12-11',
-                                              'description': 'description2',
-                                              'id': 10,
-                                              'name': 'dish_2'}}}]
+                         "date": [datetime(year=2022, month=12, day=11)],
+                         "json": [{'date': '2022-12-11T00:00:00',
+                                   'description': 'description1',
+                                   'id': 9,
+                                   'name': 'dish_1'},
+                                  {'date': '2022-12-11T00:00:00',
+                                   'description': 'description2',
+                                   'id': 10,
+                                   'name': 'dish_2'}]}]
 
 
 @patch("view.datetime")
@@ -200,17 +223,15 @@ def test_voting_for_dish_fall_access(client, user_headers):
 
 
 parametez_today_menu = [{"code": 204,
-                          "date": [datetime(year=2022, month=12, day=11)],
-                          "json": {'dish-0': {'count': 1,
-                                              'date': '2022-12-11',
-                                              'description': 'description1',
-                                              'id': 9,
-                                              'name': 'dish_1'},
-                                   'dish-1': {'count': 0,
-                                              'date': '2022-12-11',
-                                              'description': 'description2',
-                                              'id': 10,
-                                              'name': 'dish_2'}}}]
+                         "date": [datetime(year=2022, month=12, day=11)],
+                         "json": [{'count': 1,
+                                   'date': '2022-12-11T00:00:00',
+                                   'description': 'description1',
+                                   'name': 'dish_1'},
+                                  {'count': 0,
+                                   'date': '2022-12-11T00:00:00',
+                                   'description': 'description2',
+                                   'name': 'dish_2'}]}]
 
 
 @patch("view.datetime")

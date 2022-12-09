@@ -5,7 +5,6 @@ from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, current_user
 from datetime import timedelta
 from sqlalchemy.orm import relationship
-import re
 
 
 @jwt.user_identity_loader
@@ -100,7 +99,9 @@ class UserModel(Base):
         return token
 
     @classmethod
-    def authenticate(cls, email, password):
+    def authenticate(cls, **kwargs):
+        email = kwargs.get("email", None)
+        password = kwargs.get("password", None)
         user = cls.query.filter_by(email=email).one()
         if not check_password_hash(user.password, password):
             raise Exception("Uncorrected email or password ")
@@ -118,8 +119,6 @@ class RoleModel(Base):
         return "{name}".format(name=self.name)
 
 
-
-
 class DishModel(Base):
     __tablename__ = "dishes"
     id = db.Column(db.Integer(), primary_key=True)
@@ -133,7 +132,6 @@ class DishModel(Base):
         super(DishModel, self).__init__(*args, **kwargs)
         self.date = date
         self.restaurant_id = restaurant.id
-
 
     @property
     def dish_represent(self) -> dict:
