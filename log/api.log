@@ -1,0 +1,28 @@
+2022-12-09 17:38:09,623:app:WARNING:register - registration action failed with error: fail
+2022-12-09 17:38:09,953:app:WARNING:register - registration action failed with error: fail
+2022-12-09 17:38:10,565:app:WARNING:register - registration action failed with error: fail
+2022-12-09 17:38:10,978:app:WARNING:register - registration action failed with error: fail
+2022-12-09 17:43:14,864:app:WARNING:register - registration action failed with error: Uncorrected email or password
+2022-12-09 17:43:15,064:app:WARNING:register - registration action failed with error: Uncorrected email or password
+2022-12-09 17:44:08,493:app:WARNING:register - registration action failed with error: Uncorrected email or password
+2022-12-09 17:44:08,693:app:WARNING:register - registration action failed with error: Uncorrected email or password
+2022-12-09 18:05:10,846:app:WARNING:invalid input params: ['Invalid request']
+2022-12-09 18:05:12,283:app:WARNING:login - login with email fall@gmail.com failed with error: Uncorrected email or password
+2022-12-09 18:05:12,480:app:WARNING:login - login with email alex@gmail.com failed with error: Uncorrected email or password
+2022-12-09 18:05:14,149:app:WARNING:invalid input params: ['Invalid request']
+2022-12-09 18:08:27,088:app:WARNING:invalid input params: ['Invalid request']{'messages': {'json': {'email': ['User with this email already exists']}}, 'schema': <UserSchema(many=False)>, 'headers': None}
+2022-12-09 18:08:28,514:app:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
+2022-12-09 18:08:28,719:app:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
+2022-12-09 18:08:30,373:app:WARNING:invalid input params: ['Invalid request']{'messages': {'json': {'last_name': ['Missing data for required field.'], 'password': ['Missing data for required field.'], 'email': ['Missing data for required field.'], 'first_name': ['Missing data for required field.']}}, 'schema': <UserSchema(many=False)>, 'headers': None}
+2022-12-09 18:10:40,010:app:WARNING:invalid input params: {'json': {'email': ['User with this email already exists']}}
+2022-12-09 18:10:41,428:app:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
+2022-12-09 18:10:41,627:app:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
+2022-12-09 18:10:43,331:app:WARNING:invalid input params: {'json': {'password': ['Missing data for required field.'], 'last_name': ['Missing data for required field.'], 'first_name': ['Missing data for required field.'], 'email': ['Missing data for required field.']}}
+2022-12-09 18:12:49,448:app:WARNING:invalid input params: {'json': {'email': ['User with this email already exists']}}
+2022-12-09 18:12:50,865:app:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
+2022-12-09 18:12:51,068:app:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
+2022-12-09 18:12:52,741:app:WARNING:invalid input params: {'json': {'password': ['Missing data for required field.'], 'email': ['Missing data for required field.'], 'last_name': ['Missing data for required field.'], 'first_name': ['Missing data for required field.']}}
+2022-12-09 18:13:37,749:app:WARNING:invalid input params: {'json': {'email': ['User with this email already exists']}}
+2022-12-09 18:13:39,182:app:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
+2022-12-09 18:13:39,382:app:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
+2022-12-09 18:13:41,247:app:WARNING:invalid input params: {'json': {'first_name': ['Missing data for required field.'], 'password': ['Missing data for required field.'], 'email': ['Missing data for required field.'], 'last_name': ['Missing data for required field.']}}

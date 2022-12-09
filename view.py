@@ -1,6 +1,6 @@
 import datetime
 import pandas as pd
-from app import app, db, session, docs
+from app import app, db, session, docs, logger
 from models import UserModel,  RoleModel, RestaurantModel, DishModel, take_role
 from flask import request, jsonify
 from flask_jwt_extended import jwt_required, current_user, get_jwt_header, get_jwt_identity
@@ -17,12 +17,17 @@ def register(**kwargs):
     """
     Endpoint add user to UserModel.
     """
-    user = UserModel(**kwargs)
-    role = take_role(**kwargs) if get_jwt_identity() and (current_user.role[0].name == "admin") else take_role()
-    user.role.append(role)
-    session.add(user)
-    session.commit()
-    token = user.get_token()
+    user_id = get_jwt_identity()
+    try:
+        user = UserModel(**kwargs)
+        role = take_role(**kwargs) if get_jwt_identity() and (current_user.role[0].name == "admin") else take_role()
+        user.role.append(role)
+        session.add(user)
+        session.commit()
+        token = user.get_token()
+    except Exception as err:
+        logger.warning(f"user_id:{user_id}, register - registration action failed with error: {err}")
+        return {"msg": str(err)}, 400
     return {"access_token": token}, 201
 
 
@@ -35,9 +40,10 @@ def login(**kwargs):
     """
     try:
         user = UserModel.authenticate(**kwargs)
-    except Exception:
-        return {"msg": "Bad username or password"}, 401
-    token = user.get_token()
+        token = user.get_token()
+    except Exception as err:
+        logger.warning(f"login - login with email: {kwargs.get('email')} failed with error: {err}")
+        return {"msg": str(err)}, 400
     return {"access_token": token}, 202
 
 
@@ -49,11 +55,16 @@ def restaurant(**kwargs):
     """
     Endpoint add restaurant to RestaurantModel.
     """
+    user_id = get_jwt_identity()
     if request.method == "POST":
-        restaurant = RestaurantModel(**kwargs)
-        restaurant.users.append(current_user)
-        session.add(restaurant)
-        session.commit()
+        try:
+            restaurant = RestaurantModel(**kwargs)
+            restaurant.users.append(current_user)
+            session.add(restaurant)
+            session.commit()
+        except Exception as err:
+            logger.warning(f"user_id:{user_id}, restaurants - add restaurant action failed with error: {err}")
+            return {"msg": str(err)}, 400
         return restaurant, 201
 
 
@@ -64,33 +75,43 @@ def menu(*args, restaurant_slug):
     """
     Endpoint add menu to DishModel.
     """
+    user_id = get_jwt_identity()
     if request.method == "POST":
-        if restaurant_slug != current_user.restaurant.slug:
-            return jsonify({"msg": "You do not have access to the restaurant {}".format(restaurant)}), 403
-        menu_date_period = take_date(request.args.get('date_period'))
-        dishes_to_commit = []
-        for date in menu_date_period:
-            for dish in args:
-                new_dish = DishModel(date=date, restaurant=current_user.restaurant, **dish)
-                dishes_to_commit.append(new_dish)
-        session.add_all(dishes_to_commit)
-        session.commit()
+        try:
+            if restaurant_slug != current_user.restaurant.slug:
+                return jsonify({"msg": "You do not have access to the restaurant {}".format(restaurant)}), 403
+            menu_date_period = take_date(request.args.get('date_period'))
+            dishes_to_commit = []
+            for date in menu_date_period:
+                for dish in args:
+                    new_dish = DishModel(date=date, restaurant=current_user.restaurant, **dish)
+                    dishes_to_commit.append(new_dish)
+            session.add_all(dishes_to_commit)
+            session.commit()
+        except Exception as err:
+            logger.warning(f"user_id:{user_id}, restaurant_slug:{restaurant_slug}, add menu - add menu action failed with error: {err}")
+            return {"msg": str(err)}, 400
         return {}, 204
 
 
 @app.route("/menu", methods=["GET"])
 @jwt_required()
 @marshal_with(DishesSchema(many=True, only=["date", "description", "id", "name"]))
-def menu_list(dish_id=None):
+def menu_list():
     """
         Endpoint respond today menu.
     """
-    if current_user.role[0].name == "restaurant":
-        return jsonify({"msg": "You do not have access to do this"}), 403
-    if request.method == "GET":
-        date_period = take_date(request.args.get("date_period"))
-        dishes = DishModel.query.where(DishModel.date.in_(date_period)).all()
-        return dishes, 200
+    user_id = get_jwt_identity()
+    try:
+        if current_user.role[0].name == "restaurant":
+            return jsonify({"msg": "You do not have access to do this"}), 403
+        if request.method == "GET":
+            date_period = take_date(request.args.get("date_period"))
+            dishes = DishModel.query.where(DishModel.date.in_(date_period)).all()
+            return dishes, 200
+    except Exception as err:
+        logger.warning(f"user_id:{user_id}, menu -  take menu action failed with error: {err}")
+        return {"msg": str(err)}, 400
 
 
 @app.route("/menu/<dish_id>", methods=["POST"])
@@ -100,15 +121,20 @@ def menu_vote(dish_id=None):
     Voting for dish.
 
     """
-    if current_user.role[0].name == "restaurant":
-        return jsonify({"msg": "You do not have access to do this"}), 403
-    if request.method == "POST":
-        dish = DishModel.query.filter_by(id=int(dish_id)).first()
-        dish.user.append(current_user)
-        session.add(dish)
-        session.commit()
-        return jsonify({"user": current_user.first_name,
-                        "name": dish.name}), 200
+    user_id = get_jwt_identity()
+    try:
+        if current_user.role[0].name == "restaurant":
+            return jsonify({"msg": "You do not have access to do this"}), 403
+        if request.method == "POST":
+            dish = DishModel.query.filter_by(id=int(dish_id)).first()
+            dish.user.append(current_user)
+            session.add(dish)
+            session.commit()
+            return jsonify({"user": current_user.first_name,
+                            "name": dish.name}), 200
+    except Exception as err:
+        logger.warning(f"user_id:{user_id}, dish_id:{dish_id}, voting -  voting action failed with error: {err}")
+        return {"msg": str(err)}, 400
 
 
 @app.route("/order", methods=["GET"])
@@ -119,9 +145,24 @@ def order():
     Result of today votes
     :return: List of dishes with vote count
     """
-    date_period = take_date(request.args.get("date_period"))
-    dishes = DishModel.query.where(DishModel.date.in_(date_period)).all()
-    return dishes, 200
+    user_id = get_jwt_identity()
+    try:
+        date_period = take_date(request.args.get("date_period"))
+        dishes = DishModel.query.where(DishModel.date.in_(date_period)).all()
+        return dishes, 200
+    except Exception as err:
+        logger.warning(f"user_id:{user_id}, voting -  voting action failed with error: {err}")
+        return {"msg": str(err)}, 400
+
+@app.errorhandler(422)
+def error_handler(err):
+    headers = err.data.get("headers", None)
+    messages = err.data.get("messages", ["Invalid request"])
+    logger.warning(f"invalid input params: {messages}")
+    if headers:
+        return {"msg":messages}, 400, headers
+    else:
+        return {"msg":messages}, 400
 
 
 docs.register(register)

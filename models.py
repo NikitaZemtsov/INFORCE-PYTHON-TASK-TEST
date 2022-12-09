@@ -102,9 +102,12 @@ class UserModel(Base):
     def authenticate(cls, **kwargs):
         email = kwargs.get("email", None)
         password = kwargs.get("password", None)
-        user = cls.query.filter_by(email=email).one()
+        try:
+            user = cls.query.filter_by(email=email).one()
+        except Exception as err:
+            raise Exception("Uncorrected email or password")
         if not check_password_hash(user.password, password):
-            raise Exception("Uncorrected email or password ")
+            raise Exception("Uncorrected email or password")
         return user
 
 

@@ -102,10 +102,10 @@ parametez_login = [({"email": "alex@gmail.com",
                     {"code": 202}),
                    ({"email": "fall@gmail.com",
                      "password": "11111"},
-                    {"code": 401, "msg": "Bad username or password"}),
+                    {"code": 400, "msg": "Uncorrected email or password"}),
                    ({"email": "alex@gmail.com",
                      "password": "FALLL"},
-                    {"code": 401, "msg": "Bad username or password"})]
+                    {"code": 400, "msg": "Uncorrected email or password"})]
 
 
 @pytest.mark.parametrize("json, response", parametez_login)
@@ -243,3 +243,11 @@ def test_take_order(mock_date, response, client, admin_headers):
     req = client.get("/order", headers=admin_headers)
     assert req.status_code == 200
     assert req.json == response.get("json")
+
+
+def test_logger(client, admin_headers):
+    req = client.post("/register")
+    assert req.get_json() == {'msg': {'json': {'email': ['Missing data for required field.'],
+                                                'first_name': ['Missing data for required field.'],
+                                                'last_name': ['Missing data for required field.'],
+                                                'password': ['Missing data for required field.']}}}
