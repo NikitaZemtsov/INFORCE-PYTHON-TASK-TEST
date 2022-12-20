@@ -1,12 +1,12 @@
 import pytest
 import sys
 from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session, sessionmaker
 
-sys.path.append("..")
-from main import app
-from app import Base, session as db_session
-from models import UserModel, RoleModel
+sys.path.append("../..")
+
+from manage import app
+from .. import Base, session as db_session
+from ..models import UserModel, RoleModel
 
 
 @pytest.fixture(scope="session")
@@ -54,9 +54,9 @@ def roles(session):
 @pytest.fixture(scope="function")
 def user(session):
     user = UserModel(**{"first_name": "Alex",
-                       "email": "alex@gmail.com",
-                       "last_name": "Leo",
-                       "password": "11111"})
+                        "email": "alex@gmail.com",
+                        "last_name": "Leo",
+                        "password": "11111"})
     role = RoleModel.query.filter_by(name="restaurant").first()
     user.role.append(role)
     session.add(user)
@@ -67,8 +67,8 @@ def user(session):
 @pytest.fixture
 def user_token(client):
     res = client.post("/login", json={
-              "email": "alex@gmail.com",
-              "password": "11111"})
+        "email": "alex@gmail.com",
+        "password": "11111"})
     return res.json.get('access_token')
 
 
@@ -79,28 +79,31 @@ def user_headers(user_token):
     }
     return headers
 
+
 @pytest.fixture(scope="function")
 def user_admin(session):
     user = UserModel(**{"first_name": "admin",
-                       "email": "admin@gmail.com",
-                       "last_name": "ADMIN",
-                       "password": "admin"})
+                        "email": "admin@gmail.com",
+                        "last_name": "ADMIN",
+                        "password": "admin"})
     role = RoleModel.query.filter_by(name="admin").first()
     user.role.append(role)
     session.add(user)
     session.commit()
     return user
 
+
 @pytest.fixture
 def user_admin_obj():
     admin = UserModel.query.filter_by(email="admin@gmail.com").first()
     return admin
 
+
 @pytest.fixture
 def admin_token(client):
     res = client.post("/login", json={
-              "email": "admin@gmail.com",
-              "password": "admin"})
+        "email": "admin@gmail.com",
+        "password": "admin"})
     return res.json.get('access_token')
 
 
@@ -110,12 +113,3 @@ def admin_headers(admin_token):
         "Authorization": f"Bearer {admin_token}"
     }
     return headers
-
-
-
-
-
-
-
-
-

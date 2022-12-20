@@ -1,6 +1,4 @@
-from app import app
-import view
-
+from inforce import app
 
 if __name__ == "__main__":
     app.run()

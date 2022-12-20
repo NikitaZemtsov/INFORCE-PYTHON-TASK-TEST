@@ -1,10 +1,7 @@
-from main import app
 import pytest
-from models import RoleModel, RestaurantModel, DishModel, UserModel
-from datetime import datetime, date
+from ..models import RestaurantModel, DishModel, UserModel
+from datetime import datetime
 from marshmallow import ValidationError
-from conftest import user, roles
-from view import current_user
 
 from unittest.mock import patch
 
@@ -123,6 +120,7 @@ def test_add_restaurant(user_headers, client):
     assert slug == "name"
     restaurant = RestaurantModel.query.filter_by(slug=slug).first()
     assert restaurant.name == "NaMe"
+    assert restaurant.slug == "name"
     assert restaurant.users[0].first_name == "Alex"
     assert res.status_code == 201
 
@@ -153,7 +151,7 @@ parametez_restaurant_menu = [([{"name": "dish_1",
 
 @pytest.mark.parametrize("json, restaurant_slug, date_period, response", parametez_restaurant_menu)
 def test_add_menu(json, restaurant_slug, date_period, response, client, user_headers):
-    req = client.post(f"/restaurant/{restaurant_slug}/menu" + date_period,
+    req = client.post(f"/restaurants/{restaurant_slug}/menu" + date_period,
                       headers=user_headers,
                       json=json)
     assert req.status_code == response.get("code")
@@ -170,13 +168,13 @@ parametez_restaurant_menu = [([{"name": "dish_1",
                               {"code": 204, "date": [datetime(year=2022, month=12, day=11)], "dishes_len": 2})]
 
 
-@patch("view.datetime")
+@patch("inforce.view.datetime")
 @pytest.mark.parametrize("json, restaurant_slug, date_period, response", parametez_restaurant_menu)
 def test_add_menu_datenow(mock_date, json, restaurant_slug, date_period, response, client, user_headers):
     date_for_mock = response.get("date")[0]
     mock_date.utcnow.return_value = date_for_mock
     mock_date.utcnow.date.return_value = date_for_mock
-    req = client.post(f"/restaurant/{restaurant_slug}/menu" + date_period,
+    req = client.post(f"/restaurants/{restaurant_slug}/menu" + date_period,
                       headers=user_headers,
                       json=json)
     assert req.status_code == response.get("code")
@@ -198,7 +196,7 @@ parametez_today_menu = [{"code": 204,
                                    'name': 'dish_2'}]}]
 
 
-@patch("view.datetime")
+@patch("inforce.view.datetime")
 @pytest.mark.parametrize("response", parametez_today_menu)
 def test_take_today_menu(mock_date, response, client, admin_headers):
     date_for_mock = response.get("date")[0]
@@ -234,7 +232,7 @@ parametez_today_menu = [{"code": 204,
                                    'name': 'dish_2'}]}]
 
 
-@patch("view.datetime")
+@patch("inforce.view.datetime")
 @pytest.mark.parametrize("response", parametez_today_menu)
 def test_take_order(mock_date, response, client, admin_headers):
     date_for_mock = response.get("date")[0]

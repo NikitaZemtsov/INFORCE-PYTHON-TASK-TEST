@@ -1,5 +1,5 @@
 from marshmallow import Schema, validate, fields, validates, ValidationError, pre_dump, post_dump
-from models import UserModel, RestaurantModel
+from inforce.models import UserModel, RestaurantModel
 
 
 class UserSchema(Schema):

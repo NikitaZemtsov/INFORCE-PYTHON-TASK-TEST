@@ -26,3 +26,152 @@
 2022-12-09 18:13:39,182:app:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
 2022-12-09 18:13:39,382:app:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
 2022-12-09 18:13:41,247:app:WARNING:invalid input params: {'json': {'first_name': ['Missing data for required field.'], 'password': ['Missing data for required field.'], 'email': ['Missing data for required field.'], 'last_name': ['Missing data for required field.']}}
+2022-12-14 10:31:25,129:inforce:WARNING:invalid input params: {'json': {'email': ['User with this email already exists']}}
+2022-12-14 10:31:27,335:inforce:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
+2022-12-14 10:31:27,622:inforce:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
+2022-12-14 10:31:30,129:inforce:WARNING:user_id:4, dish_id:9, voting -  voting action failed with error: 'NoneType' object has no attribute 'user'
+2022-12-14 10:31:31,203:inforce:WARNING:invalid input params: {'json': {'first_name': ['Missing data for required field.'], 'email': ['Missing data for required field.'], 'last_name': ['Missing data for required field.'], 'password': ['Missing data for required field.']}}
+2022-12-14 10:34:06,110:inforce:WARNING:invalid input params: {'json': {'email': ['User with this email already exists']}}
+2022-12-14 10:34:08,184:inforce:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
+2022-12-14 10:34:08,480:inforce:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
+2022-12-14 10:34:10,952:inforce:WARNING:user_id:4, dish_id:9, voting -  voting action failed with error: 'NoneType' object has no attribute 'user'
+2022-12-14 10:34:11,962:inforce:WARNING:invalid input params: {'json': {'first_name': ['Missing data for required field.'], 'last_name': ['Missing data for required field.'], 'email': ['Missing data for required field.'], 'password': ['Missing data for required field.']}}
+2022-12-14 10:34:44,684:inforce:WARNING:invalid input params: {'json': {'email': ['User with this email already exists']}}
+2022-12-14 10:34:46,907:inforce:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
+2022-12-14 10:34:47,185:inforce:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
+2022-12-14 10:34:49,615:inforce:WARNING:user_id:4, dish_id:9, voting -  voting action failed with error: 'NoneType' object has no attribute 'user'
+2022-12-14 10:34:50,590:inforce:WARNING:invalid input params: {'json': {'first_name': ['Missing data for required field.'], 'last_name': ['Missing data for required field.'], 'password': ['Missing data for required field.'], 'email': ['Missing data for required field.']}}
+2022-12-14 10:35:31,085:inforce:WARNING:invalid input params: {'json': {'email': ['User with this email already exists']}}
+2022-12-14 10:35:33,404:inforce:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
+2022-12-14 10:35:33,763:inforce:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
+2022-12-14 10:35:36,087:inforce:WARNING:user_id:4, dish_id:9, voting -  voting action failed with error: 'NoneType' object has no attribute 'user'
+2022-12-14 10:35:37,126:inforce:WARNING:invalid input params: {'json': {'email': ['Missing data for required field.'], 'password': ['Missing data for required field.'], 'first_name': ['Missing data for required field.'], 'last_name': ['Missing data for required field.']}}
+2022-12-14 10:41:00,304:inforce:WARNING:user_id:None, register - registration action failed with error: Can't flush None value found in collection UserModel.role
+2022-12-14 10:41:00,717:inforce:WARNING:user_id:None, register - registration action failed with error: Can't flush None value found in collection UserModel.role
+2022-12-14 10:41:01,044:inforce:WARNING:user_id:None, register - registration action failed with error: Can't flush None value found in collection UserModel.role
+2022-12-14 10:41:02,513:inforce:WARNING:user_id:1, register - registration action failed with error: Can't flush None value found in collection UserModel.role
+2022-12-14 10:41:02,871:inforce:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
+2022-12-14 10:41:03,194:inforce:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
+2022-12-14 10:41:05,331:inforce:WARNING:user_id:5, dish_id:9, voting -  voting action failed with error: 'NoneType' object has no attribute 'user'
+2022-12-14 10:41:06,404:inforce:WARNING:invalid input params: {'json': {'email': ['Missing data for required field.'], 'password': ['Missing data for required field.'], 'last_name': ['Missing data for required field.'], 'first_name': ['Missing data for required field.']}}
+2022-12-14 10:42:43,301:inforce:WARNING:user_id:None, register - registration action failed with error: Can't flush None value found in collection UserModel.role
+2022-12-14 10:42:43,838:inforce:WARNING:user_id:None, register - registration action failed with error: Can't flush None value found in collection UserModel.role
+2022-12-14 10:42:44,134:inforce:WARNING:user_id:None, register - registration action failed with error: Can't flush None value found in collection UserModel.role
+2022-12-14 10:42:45,720:inforce:WARNING:user_id:1, register - registration action failed with error: Can't flush None value found in collection UserModel.role
+2022-12-14 10:42:46,037:inforce:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
+2022-12-14 10:42:46,361:inforce:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
+2022-12-14 10:42:48,655:inforce:WARNING:user_id:5, dish_id:9, voting -  voting action failed with error: 'NoneType' object has no attribute 'user'
+2022-12-14 10:42:49,666:inforce:WARNING:invalid input params: {'json': {'last_name': ['Missing data for required field.'], 'email': ['Missing data for required field.'], 'password': ['Missing data for required field.'], 'first_name': ['Missing data for required field.']}}
+2022-12-14 10:45:02,023:inforce:WARNING:user_id:None, register - registration action failed with error: Can't flush None value found in collection UserModel.role
+2022-12-14 10:45:02,493:inforce:WARNING:user_id:None, register - registration action failed with error: Can't flush None value found in collection UserModel.role
+2022-12-14 10:45:02,757:inforce:WARNING:user_id:None, register - registration action failed with error: Can't flush None value found in collection UserModel.role
+2022-12-14 10:45:04,266:inforce:WARNING:user_id:1, register - registration action failed with error: Can't flush None value found in collection UserModel.role
+2022-12-14 10:45:04,568:inforce:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
+2022-12-14 10:45:04,845:inforce:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
+2022-12-14 10:45:05,604:inforce:WARNING:user_id:1, restaurant_slug:name, add menu - add menu action failed with error: 'UserModel' object has no attribute 'restaurant_app'
+2022-12-14 10:45:05,935:inforce:WARNING:user_id:1, restaurant_slug:name, add menu - add menu action failed with error: 'UserModel' object has no attribute 'restaurant_app'
+2022-12-14 10:45:07,276:inforce:WARNING:user_id:5, dish_id:9, voting -  voting action failed with error: 'NoneType' object has no attribute 'user'
+2022-12-14 10:45:08,318:inforce:WARNING:invalid input params: {'json': {'first_name': ['Missing data for required field.'], 'email': ['Missing data for required field.'], 'last_name': ['Missing data for required field.'], 'password': ['Missing data for required field.']}}
+2022-12-14 10:45:59,147:inforce:WARNING:user_id:None, register - registration action failed with error: Can't flush None value found in collection UserModel.role
+2022-12-14 10:45:59,579:inforce:WARNING:user_id:None, register - registration action failed with error: Can't flush None value found in collection UserModel.role
+2022-12-14 10:45:59,901:inforce:WARNING:user_id:None, register - registration action failed with error: Can't flush None value found in collection UserModel.role
+2022-12-14 10:46:01,546:inforce:WARNING:user_id:1, register - registration action failed with error: Can't flush None value found in collection UserModel.role
+2022-12-14 10:46:01,933:inforce:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
+2022-12-14 10:46:02,228:inforce:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
+2022-12-14 10:46:02,945:inforce:WARNING:user_id:1, restaurant_slug:name, add menu - add menu action failed with error: 'UserModel' object has no attribute 'restaurant_app'
+2022-12-14 10:46:03,237:inforce:WARNING:user_id:1, restaurant_slug:name, add menu - add menu action failed with error: 'UserModel' object has no attribute 'restaurant_app'
+2022-12-14 10:46:04,388:inforce:WARNING:user_id:5, dish_id:9, voting -  voting action failed with error: 'NoneType' object has no attribute 'user'
+2022-12-14 10:46:05,406:inforce:WARNING:invalid input params: {'json': {'last_name': ['Missing data for required field.'], 'password': ['Missing data for required field.'], 'first_name': ['Missing data for required field.'], 'email': ['Missing data for required field.']}}
+2022-12-14 10:47:50,423:inforce:WARNING:invalid input params: {'json': {'email': ['User with this email already exists']}}
+2022-12-14 10:47:52,583:inforce:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
+2022-12-14 10:47:52,890:inforce:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
+2022-12-14 10:47:53,566:inforce:WARNING:user_id:1, restaurant_slug:name, add menu - add menu action failed with error: 'UserModel' object has no attribute 'restaurant_app'
+2022-12-14 10:47:54,032:inforce:WARNING:user_id:1, restaurant_slug:name, add menu - add menu action failed with error: 'UserModel' object has no attribute 'restaurant_app'
+2022-12-14 10:47:55,195:inforce:WARNING:user_id:4, dish_id:9, voting -  voting action failed with error: 'NoneType' object has no attribute 'user'
+2022-12-14 10:47:56,235:inforce:WARNING:invalid input params: {'json': {'first_name': ['Missing data for required field.'], 'password': ['Missing data for required field.'], 'email': ['Missing data for required field.'], 'last_name': ['Missing data for required field.']}}
+2022-12-14 10:53:17,016:inforce:WARNING:invalid input params: {'json': {'email': ['User with this email already exists']}}
+2022-12-14 10:53:19,165:inforce:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
+2022-12-14 10:53:19,463:inforce:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
+2022-12-14 10:53:21,829:inforce:WARNING:user_id:4, dish_id:9, voting -  voting action failed with error: 'NoneType' object has no attribute 'user'
+2022-12-14 10:53:22,837:inforce:WARNING:invalid input params: {'json': {'email': ['Missing data for required field.'], 'last_name': ['Missing data for required field.'], 'password': ['Missing data for required field.'], 'first_name': ['Missing data for required field.']}}
+2022-12-14 10:53:37,945:inforce:WARNING:invalid input params: {'json': {'email': ['User with this email already exists']}}
+2022-12-14 10:53:40,142:inforce:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
+2022-12-14 10:53:40,473:inforce:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
+2022-12-14 10:53:41,168:inforce:WARNING:user_id:1, restaurant_slug:name, add menu - add menu action failed with error: 'UserModel' object has no attribute 'restaurant_app'
+2022-12-14 10:53:41,719:inforce:WARNING:user_id:1, restaurant_slug:name, add menu - add menu action failed with error: 'UserModel' object has no attribute 'restaurant_app'
+2022-12-14 10:53:42,967:inforce:WARNING:user_id:4, dish_id:9, voting -  voting action failed with error: 'NoneType' object has no attribute 'user'
+2022-12-14 10:53:43,908:inforce:WARNING:invalid input params: {'json': {'first_name': ['Missing data for required field.'], 'password': ['Missing data for required field.'], 'last_name': ['Missing data for required field.'], 'email': ['Missing data for required field.']}}
+2022-12-14 10:59:00,168:inforce:WARNING:invalid input params: {'json': {'email': ['User with this email already exists']}}
+2022-12-14 10:59:02,397:inforce:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
+2022-12-14 10:59:02,696:inforce:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
+2022-12-14 10:59:03,308:inforce:WARNING:user_id:1, restaurant_slug:name, add menu - add menu action failed with error: 'UserModel' object has no attribute 'restaurant_app'
+2022-12-14 10:59:03,741:inforce:WARNING:user_id:1, restaurant_slug:name, add menu - add menu action failed with error: 'UserModel' object has no attribute 'restaurant_app'
+2022-12-14 10:59:04,919:inforce:WARNING:user_id:4, dish_id:9, voting -  voting action failed with error: 'NoneType' object has no attribute 'user'
+2022-12-14 10:59:05,928:inforce:WARNING:invalid input params: {'json': {'password': ['Missing data for required field.'], 'first_name': ['Missing data for required field.'], 'email': ['Missing data for required field.'], 'last_name': ['Missing data for required field.']}}
+2022-12-14 10:59:57,648:inforce:WARNING:invalid input params: {'json': {'email': ['User with this email already exists']}}
+2022-12-14 10:59:59,828:inforce:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
+2022-12-14 11:00:00,110:inforce:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
+2022-12-14 11:00:00,795:inforce:WARNING:user_id:1, restaurant_slug:name, add menu - add menu action failed with error: 'UserModel' object has no attribute 'restaurant_app'
+2022-12-14 11:00:01,318:inforce:WARNING:user_id:1, restaurant_slug:name, add menu - add menu action failed with error: 'UserModel' object has no attribute 'restaurant_app'
+2022-12-14 11:00:02,500:inforce:WARNING:user_id:4, dish_id:9, voting -  voting action failed with error: 'NoneType' object has no attribute 'user'
+2022-12-14 11:00:03,527:inforce:WARNING:invalid input params: {'json': {'password': ['Missing data for required field.'], 'first_name': ['Missing data for required field.'], 'last_name': ['Missing data for required field.'], 'email': ['Missing data for required field.']}}
+2022-12-14 11:02:59,610:inforce:WARNING:invalid input params: {'json': {'email': ['User with this email already exists']}}
+2022-12-14 11:03:01,779:inforce:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
+2022-12-14 11:03:02,120:inforce:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
+2022-12-14 11:05:36,468:inforce:WARNING:invalid input params: {'json': {'email': ['User with this email already exists']}}
+2022-12-14 11:05:38,741:inforce:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
+2022-12-14 11:05:38,988:inforce:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
+2022-12-14 11:05:39,614:inforce:WARNING:user_id:1, restaurant_slug:name, add menu - add menu action failed with error: 'UserModel' object has no attribute 'restaurant_app'
+2022-12-14 11:05:40,095:inforce:WARNING:user_id:1, restaurant_slug:name, add menu - add menu action failed with error: 'UserModel' object has no attribute 'restaurant_app'
+2022-12-14 11:05:41,297:inforce:WARNING:user_id:4, dish_id:9, voting -  voting action failed with error: 'NoneType' object has no attribute 'user'
+2022-12-14 11:05:42,377:inforce:WARNING:invalid input params: {'json': {'email': ['Missing data for required field.'], 'first_name': ['Missing data for required field.'], 'password': ['Missing data for required field.'], 'last_name': ['Missing data for required field.']}}
+2022-12-14 11:07:33,582:inforce:WARNING:invalid input params: {'json': {'email': ['User with this email already exists']}}
+2022-12-14 11:07:35,693:inforce:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
+2022-12-14 11:07:36,018:inforce:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
+2022-12-14 11:07:36,642:inforce:WARNING:user_id:1, restaurant_slug:name, add menu - add menu action failed with error: 'UserModel' object has no attribute 'restaurant_app'
+2022-12-14 11:07:37,104:inforce:WARNING:user_id:1, restaurant_slug:name, add menu - add menu action failed with error: 'UserModel' object has no attribute 'restaurant_app'
+2022-12-14 11:07:38,274:inforce:WARNING:user_id:4, dish_id:9, voting -  voting action failed with error: 'NoneType' object has no attribute 'user'
+2022-12-14 11:07:39,278:inforce:WARNING:invalid input params: {'json': {'email': ['Missing data for required field.'], 'first_name': ['Missing data for required field.'], 'last_name': ['Missing data for required field.'], 'password': ['Missing data for required field.']}}
+2022-12-14 11:08:26,420:inforce:WARNING:invalid input params: {'json': {'email': ['User with this email already exists']}}
+2022-12-14 11:08:28,693:inforce:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
+2022-12-14 11:08:29,061:inforce:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
+2022-12-14 11:10:13,170:inforce:WARNING:invalid input params: {'json': {'email': ['User with this email already exists']}}
+2022-12-14 11:10:15,252:inforce:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
+2022-12-14 11:10:15,560:inforce:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
+2022-12-14 11:10:17,768:inforce:WARNING:user_id:4, dish_id:9, voting -  voting action failed with error: 'NoneType' object has no attribute 'user'
+2022-12-14 11:10:18,756:inforce:WARNING:invalid input params: {'json': {'first_name': ['Missing data for required field.'], 'password': ['Missing data for required field.'], 'last_name': ['Missing data for required field.'], 'email': ['Missing data for required field.']}}
+2022-12-14 11:10:49,089:inforce:WARNING:invalid input params: {'json': {'email': ['User with this email already exists']}}
+2022-12-14 11:10:51,313:inforce:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
+2022-12-14 11:10:51,596:inforce:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
+2022-12-14 11:10:54,022:inforce:WARNING:user_id:4, dish_id:9, voting -  voting action failed with error: 'NoneType' object has no attribute 'user'
+2022-12-14 11:10:55,121:inforce:WARNING:invalid input params: {'json': {'last_name': ['Missing data for required field.'], 'password': ['Missing data for required field.'], 'email': ['Missing data for required field.'], 'first_name': ['Missing data for required field.']}}
+2022-12-14 11:12:06,069:inforce:WARNING:invalid input params: {'json': {'email': ['User with this email already exists']}}
+2022-12-14 11:12:08,222:inforce:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
+2022-12-14 11:12:08,498:inforce:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
+2022-12-14 11:12:10,855:inforce:WARNING:user_id:4, dish_id:9, voting -  voting action failed with error: 'NoneType' object has no attribute 'user'
+2022-12-14 11:12:11,950:inforce:WARNING:invalid input params: {'json': {'last_name': ['Missing data for required field.'], 'password': ['Missing data for required field.'], 'email': ['Missing data for required field.'], 'first_name': ['Missing data for required field.']}}
+2022-12-14 11:16:55,437:inforce:WARNING:invalid input params: {'json': {'email': ['User with this email already exists']}}
+2022-12-14 11:16:57,807:inforce:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
+2022-12-14 11:16:58,103:inforce:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
+2022-12-14 11:18:05,013:inforce:WARNING:invalid input params: {'json': {'email': ['User with this email already exists']}}
+2022-12-14 11:18:07,316:inforce:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
+2022-12-14 11:18:07,579:inforce:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
+2022-12-14 11:19:13,358:inforce:WARNING:invalid input params: {'json': {'email': ['User with this email already exists']}}
+2022-12-14 11:19:15,509:inforce:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
+2022-12-14 11:19:15,784:inforce:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
+2022-12-14 11:19:55,023:inforce:WARNING:invalid input params: {'json': {'email': ['User with this email already exists']}}
+2022-12-14 11:19:57,248:inforce:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
+2022-12-14 11:19:57,506:inforce:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
+2022-12-14 11:20:00,797:inforce:WARNING:invalid input params: {'json': {'last_name': ['Missing data for required field.'], 'password': ['Missing data for required field.'], 'email': ['Missing data for required field.'], 'first_name': ['Missing data for required field.']}}
+2022-12-14 11:22:05,257:inforce:WARNING:invalid input params: {'json': {'email': ['User with this email already exists']}}
+2022-12-14 11:22:07,471:inforce:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
+2022-12-14 11:22:07,752:inforce:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
+2022-12-14 11:22:11,177:inforce:WARNING:invalid input params: {'json': {'email': ['Missing data for required field.'], 'first_name': ['Missing data for required field.'], 'last_name': ['Missing data for required field.'], 'password': ['Missing data for required field.']}}
+2022-12-14 11:22:30,749:inforce:WARNING:invalid input params: {'json': {'email': ['User with this email already exists']}}
+2022-12-14 11:22:32,900:inforce:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
+2022-12-14 11:22:33,175:inforce:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
+2022-12-14 11:22:36,016:inforce:WARNING:invalid input params: {'json': {'last_name': ['Missing data for required field.'], 'first_name': ['Missing data for required field.'], 'password': ['Missing data for required field.'], 'email': ['Missing data for required field.']}}
+2022-12-16 10:44:12,578:inforce:WARNING:invalid input params: {'json': {'email': ['User with this email already exists']}}
+2022-12-16 10:44:15,071:inforce:WARNING:login - login with email: fall@gmail.com failed with error: Uncorrected email or password
+2022-12-16 10:44:15,380:inforce:WARNING:login - login with email: alex@gmail.com failed with error: Uncorrected email or password
+2022-12-16 10:44:18,663:inforce:WARNING:invalid input params: {'json': {'password': ['Missing data for required field.'], 'email': ['Missing data for required field.'], 'first_name': ['Missing data for required field.'], 'last_name': ['Missing data for required field.']}}
